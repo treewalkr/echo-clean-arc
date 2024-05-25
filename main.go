@@ -32,6 +32,28 @@ func main() {
 		return c.String(http.StatusOK, "Hello, Echo!")
 	})
 
+	// Define more routes
+	e.GET("/users", func(c echo.Context) error {
+		var users []User
+		result := db.Find(&users)
+		if result.Error != nil {
+			return c.String(http.StatusInternalServerError, "Failed to get users")
+		}
+		return c.JSON(http.StatusOK, users)
+	})
+
+	e.POST("/users", func(c echo.Context) error {
+		u := new(User)
+		if err := c.Bind(u); err != nil {
+			return err
+		}
+		result := db.Create(u)
+		if result.Error != nil {
+			return c.String(http.StatusInternalServerError, "Failed to create user")
+		}
+		return c.JSON(http.StatusCreated, u)
+	})
+
 	// Start the server
 	e.Logger.Fatal(e.Start(":3000"))
 }
