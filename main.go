@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -14,6 +15,15 @@ type User struct {
 }
 
 func main() {
+	// Setup Gorm with SQLite
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	// Migrate the schema
+	db.AutoMigrate(&User{})
+
 	// Create a new Echo instance
 	e := echo.New()
 
