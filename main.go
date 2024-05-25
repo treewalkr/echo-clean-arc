@@ -4,7 +4,14 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
+
+type User struct {
+	gorm.Model
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
 
 func main() {
 	// Create a new Echo instance
