@@ -2,8 +2,7 @@ package main
 
 import (
 	"echo-clean-arc/db"
-	"echo-clean-arc/domain"
-	"net/http"
+	"echo-clean-arc/handler"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,35 +14,17 @@ func main() {
 		panic("failed to connect database")
 	}
 
+	// Create the handlers
+	helloHandler := handler.NewHelloHandler()
+	userHandler := handler.NewUserHandler(db)
+
 	// Create a new Echo instance
 	e := echo.New()
 
-	// Define a route
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Echo!")
-	})
-
-	// Define more routes
-	e.GET("/users", func(c echo.Context) error {
-		var users []domain.User
-		result := db.Find(&users)
-		if result.Error != nil {
-			return c.String(http.StatusInternalServerError, "Failed to get users")
-		}
-		return c.JSON(http.StatusOK, users)
-	})
-
-	e.POST("/users", func(c echo.Context) error {
-		u := new(domain.User)
-		if err := c.Bind(u); err != nil {
-			return err
-		}
-		result := db.Create(u)
-		if result.Error != nil {
-			return c.String(http.StatusInternalServerError, "Failed to create user")
-		}
-		return c.JSON(http.StatusCreated, u)
-	})
+	// Define the routes
+	e.GET("/", helloHandler.Hello)
+	e.GET("/users", userHandler.FindAll)
+	e.POST("/users", userHandler.Create)
 
 	// Start the server
 	e.Logger.Fatal(e.Start(":3000"))
