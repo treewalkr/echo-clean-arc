@@ -14,15 +14,24 @@ type User struct {
 	Email string `json:"email"`
 }
 
-func main() {
-	// Setup Gorm with SQLite
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+func NewDatabase(dsn string) (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		return nil, err
 	}
 
 	// Migrate the schema
 	db.AutoMigrate(&User{})
+
+	return db, nil
+}
+
+func main() {
+	// Setup Gorm with SQLite
+	db, err := NewDatabase("example.db")
+	if err != nil {
+		panic("failed to connect database")
+	}
 
 	// Create a new Echo instance
 	e := echo.New()

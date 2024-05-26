@@ -27,3 +27,7 @@ heapdump.*
 
 # Standard Go directories
 bin/
+
+# Environment variables
+*.env
+.env.*
