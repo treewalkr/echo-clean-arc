@@ -1,29 +1,16 @@
 package main
 
 import (
+	"echo-clean-arc/db"
 	"echo-clean-arc/domain"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
-func NewDatabase(dsn string) (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	// Migrate the schema
-	db.AutoMigrate(&domain.User{})
-
-	return db, nil
-}
-
 func main() {
-	// Setup Gorm with SQLite
-	db, err := NewDatabase("example.db")
+	// Connect to the database
+	db, err := db.New("example.db")
 	if err != nil {
 		panic("failed to connect database")
 	}
