@@ -1,18 +1,13 @@
 package main
 
 import (
+	"echo-clean-arc/domain"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
-
-type User struct {
-	gorm.Model
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
 
 func NewDatabase(dsn string) (*gorm.DB, error) {
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
@@ -21,7 +16,7 @@ func NewDatabase(dsn string) (*gorm.DB, error) {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&domain.User{})
 
 	return db, nil
 }
@@ -43,7 +38,7 @@ func main() {
 
 	// Define more routes
 	e.GET("/users", func(c echo.Context) error {
-		var users []User
+		var users []domain.User
 		result := db.Find(&users)
 		if result.Error != nil {
 			return c.String(http.StatusInternalServerError, "Failed to get users")
@@ -52,7 +47,7 @@ func main() {
 	})
 
 	e.POST("/users", func(c echo.Context) error {
-		u := new(User)
+		u := new(domain.User)
 		if err := c.Bind(u); err != nil {
 			return err
 		}
