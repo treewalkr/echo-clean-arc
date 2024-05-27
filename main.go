@@ -3,6 +3,7 @@ package main
 import (
 	"echo-clean-arc/db"
 	"echo-clean-arc/handler"
+	"echo-clean-arc/repository"
 	"echo-clean-arc/service"
 
 	"github.com/labstack/echo/v4"
@@ -15,8 +16,11 @@ func main() {
 		panic("failed to connect database")
 	}
 
+	// Create the repository
+	userRepository := repository.NewUserRepository(db)
+
 	// Create the service
-	userService := service.NewUserService(db)
+	userService := service.NewUserService(userRepository)
 
 	// Create the handlers
 	helloHandler := handler.NewHelloHandler()
