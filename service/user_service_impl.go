@@ -2,40 +2,30 @@ package service
 
 import (
 	"echo-clean-arc/domain"
-
-	"gorm.io/gorm"
+	"echo-clean-arc/repository"
 )
 
+// UserService represent the user's service contract
 type UserServiceImpl struct {
-	db *gorm.DB
+	useRepository repository.UserRepository
 }
 
-func NewUserService(db *gorm.DB) UserService {
-	return &UserServiceImpl{db}
+// NewUserService creates a new user service.
+func NewUserService(useRepository repository.UserRepository) UserService {
+	return &UserServiceImpl{useRepository}
 }
 
+// FindAll finds all users.
 func (s *UserServiceImpl) FindAll() ([]domain.User, error) {
-	var users []domain.User
-	result := s.db.Find(&users)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return users, nil
+	return s.useRepository.FindAll()
 }
 
+// FindById finds a user by its id.
 func (s *UserServiceImpl) FindById(id int) (*domain.User, error) {
-	var user domain.User
-	result := s.db.First(&user, id)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &user, nil
+	return s.useRepository.FindById(id)
 }
 
+// Create creates a new user.
 func (s *UserServiceImpl) Create(u *domain.User) error {
-	result := s.db.Create(u)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+	return s.useRepository.Create(u)
 }
