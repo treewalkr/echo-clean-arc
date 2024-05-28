@@ -27,7 +27,9 @@ func (r *Router) RegisterRoutes(
 	userHandler *h.UserHandler,
 ) {
 	r.echo.GET("/", helloHandler.Hello)
-	r.echo.GET("/users", userHandler.FindAll)
-	r.echo.GET("/users/:id", userHandler.FindById)
-	r.echo.POST("/users", userHandler.Create)
+
+	api := r.echo.Group("/api/v1/users")
+	api.GET("", userHandler.FindAll)
+	api.GET("/:id", userHandler.FindById)
+	api.POST("", userHandler.Create)
 }
