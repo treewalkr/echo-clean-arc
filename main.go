@@ -1,6 +1,7 @@
 package main
 
 import (
+	"echo-clean-arc/config"
 	"echo-clean-arc/db"
 	"echo-clean-arc/handler"
 	"echo-clean-arc/repository"
@@ -9,8 +10,14 @@ import (
 )
 
 func main() {
+	// Load the configuration
+	cfg, err := config.Load()
+	if err != nil {
+		panic("failed to load configuration")
+	}
+
 	// Connect to the database
-	db, err := db.New("example.db")
+	db, err := db.New(cfg.DB)
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -30,5 +37,5 @@ func main() {
 	echo := router.New(httpHandlers)
 
 	// Start the server
-	echo.Logger.Fatal(echo.Start(":3000"))
+	echo.Logger.Fatal(echo.Start(cfg.App.Port))
 }
