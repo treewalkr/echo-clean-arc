@@ -29,3 +29,10 @@ The project follows these steps:
 - **Testing:** Add comprehensive unit and integration tests.
 - **Documentation:**  Improve documentation and add more explanations.
 - **CI/CD:**  Set up a CI/CD pipeline for automated building and deployment.
+
+## Running the App (Development)
+```bash
+cp .env.example .env
+cp .env.example .env.development
+go run main.go
+```
