@@ -22,15 +22,13 @@ func main() {
 	userService := service.NewUserService(userRepository)
 
 	// Create the handlers
-	helloHandler := handler.NewHelloHandler()
-	userHandler := handler.NewUserHandler(userService)
+	httpHandlers := handler.New(
+		handler.NewHelloHandler(),
+		handler.NewUserHandler(userService),
+	)
 
-	// Create the router
-	router := router.New()
-
-	// Register the routes
-	router.RegisterRoutes(helloHandler, userHandler)
+	echo := router.New(httpHandlers)
 
 	// Start the server
-	router.Eecho.Logger.Fatal(router.Eecho.Start(":3000"))
+	echo.Logger.Fatal(echo.Start(":3000"))
 }

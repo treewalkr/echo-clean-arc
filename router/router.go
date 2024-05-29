@@ -9,39 +9,48 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// Router manages the application's routing configuration
 type Router struct {
-	Eecho *echo.Echo
+	echo    *echo.Echo
+	handler *h.HttpHandlers
 }
 
-var once sync.Once
-var router *Router
+var (
+	once   sync.Once
+	router *Router
+)
 
-func New() *Router {
+// New creates a singleton Echo router instance
+// It uses sync.Once to ensure thread-safe initialization
+func New(handler *h.HttpHandlers) *echo.Echo {
 	once.Do(func() {
 		router = &Router{
-			Eecho: echo.New(),
+			echo:    echo.New(),
+			handler: handler,
 		}
+		router.registerRoutes()
 	})
 
-	return router
+	return router.echo
 }
 
-func (r *Router) RegisterRoutes(
-	helloHandler *h.HelloHandler,
-	userHandler *h.UserHandler,
-) {
-	r.Eecho.GET("/", helloHandler.Hello)
+// registerRoutes defines all application routes
+func (r *Router) registerRoutes() {
+	// Public routes
+	r.echo.GET("/", r.handler.HelloHandler.Hello)
 
-	api := r.Eecho.Group("/api")
+	// API group with versioning
+	api := r.echo.Group("/api/v1")
 	{
+		// Users routes with authentication
 		users := api.Group("/users")
 		{
-			// Apply the authentication middleware
+			// Apply authentication middleware to protected routes
 			users.Use(middleware.Authentication)
 
-			users.GET("", userHandler.FindAll)
-			users.GET("/:id", userHandler.FindById)
-			users.POST("", userHandler.Create)
+			users.GET("", r.handler.UserHandler.FindAll)
+			users.GET("/:id", r.handler.UserHandler.FindById)
+			users.POST("", r.handler.UserHandler.Create)
 		}
 	}
 }
