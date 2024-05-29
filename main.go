@@ -6,8 +6,6 @@ import (
 	"echo-clean-arc/repository"
 	"echo-clean-arc/router"
 	"echo-clean-arc/service"
-
-	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -27,13 +25,12 @@ func main() {
 	helloHandler := handler.NewHelloHandler()
 	userHandler := handler.NewUserHandler(userService)
 
-	// Create a new Echo instance
-	e := echo.New()
+	// Create the router
+	router := router.New()
 
-	router := router.New(e)
-
+	// Register the routes
 	router.RegisterRoutes(helloHandler, userHandler)
 
 	// Start the server
-	e.Logger.Fatal(e.Start(":3000"))
+	router.Eecho.Logger.Fatal(router.Eecho.Start(":3000"))
 }

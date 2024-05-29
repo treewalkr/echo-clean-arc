@@ -10,16 +10,19 @@ import (
 )
 
 type Router struct {
-	echo *echo.Echo
+	Eecho *echo.Echo
 }
 
 var once sync.Once
 var router *Router
 
-func New(e *echo.Echo) *Router {
+func New() *Router {
 	once.Do(func() {
-		router = &Router{echo: e}
+		router = &Router{
+			Eecho: echo.New(),
+		}
 	})
+
 	return router
 }
 
@@ -27,15 +30,18 @@ func (r *Router) RegisterRoutes(
 	helloHandler *h.HelloHandler,
 	userHandler *h.UserHandler,
 ) {
-	r.echo.GET("/", helloHandler.Hello)
+	r.Eecho.GET("/", helloHandler.Hello)
 
-	api := r.echo.Group("/api/v1/users")
+	api := r.Eecho.Group("/api")
 	{
-		// Apply the authentication middleware
-		api.Use(middleware.Authentication)
+		users := api.Group("/users")
+		{
+			// Apply the authentication middleware
+			users.Use(middleware.Authentication)
 
-		api.GET("", userHandler.FindAll)
-		api.GET("/:id", userHandler.FindById)
-		api.POST("", userHandler.Create)
+			users.GET("", userHandler.FindAll)
+			users.GET("/:id", userHandler.FindById)
+			users.POST("", userHandler.Create)
+		}
 	}
 }
